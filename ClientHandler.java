@@ -27,7 +27,7 @@ public class ClientHandler extends Thread {
                     handleMouseClick();
                 }
             }
-            br.close();
+            //br.close(); //---- closes the socket since inputstream is socket -> error in remoteserver
         } catch (IOException e1) {
             e1.printStackTrace();
         }

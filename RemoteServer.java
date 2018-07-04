@@ -16,23 +16,36 @@ public class RemoteServer {
         //server.setSoTimeout(180000);
     }
 
-    private void connect() throws IOException, AWTException {
+    private void connect() {
         Socket socket;
-        rob = new Robot();
+        try {
+            rob = new Robot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
         System.out.println("Server started.");
         while(true) {
-            socket = server.accept();
-            System.out.println("Client connected: " + socket.getInetAddress());
-            //Thread t = new ClientHandler(socket);
-            //t.start();
-            //System.out.println("Thread for reading started");
-            while(socket.isConnected()) {
-                BufferedImage img = captureScreen();
-                ImageIO.write(img, "bmp", socket.getOutputStream());
-                img.flush();
+            try {
+                socket = server.accept();
+
+                System.out.println("Client connected: " + socket.getInetAddress());
+                //Thread t = new ClientHandler(socket);
+                //t.start();
+                //System.out.println("Thread for reading started");
+                while(socket.isConnected()) {
+                    BufferedImage img = captureScreen();
+                    ImageIO.write(img, "bmp", socket.getOutputStream());
+                    img.flush();
+                }
+                System.out.println("Client disconnected!");
+                socket.shutdownInput();
+                socket.shutdownOutput();
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (AWTException e) {
+                e.printStackTrace();
             }
-            //System.out.println("Client disconnected!");
-            socket.close();
         }
     }
 
