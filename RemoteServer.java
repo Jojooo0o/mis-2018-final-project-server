@@ -32,11 +32,10 @@ public class RemoteServer {
                 Thread t = new ClientHandler(socket);
                 t.start();
                 System.out.println("Thread for reading started");
-                while(socket.isConnected()) {
-                    System.out.println("Connection Status: " + socket.isConnected());
+                while(socket.isConnected() && !(((ClientHandler) t).m_exit)) {
                     System.out.println("sending images");
                     BufferedImage img = captureScreen();
-                    if(socket.isConnected()) {
+                    if(!(((ClientHandler) t).m_exit)) {
                         ImageIO.write(img, "png", socket.getOutputStream());
                     }
                     img.flush();

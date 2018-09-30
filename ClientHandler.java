@@ -8,6 +8,7 @@ public class ClientHandler extends Thread {
 
     final Socket m_socket;
     final Robot rob = new Robot();
+    boolean m_exit = false;
 
     public ClientHandler(Socket socket) throws AWTException {
         m_socket = socket;
@@ -17,38 +18,25 @@ public class ClientHandler extends Thread {
     public void run() {
         String in;
         try {
-            while(m_socket.isConnected()){
+            while(m_socket.isConnected() && !m_exit){
                 BufferedReader br = new BufferedReader(new InputStreamReader(m_socket.getInputStream()));
                 while (br.ready() && ((in = br.readLine()) != null)) {
-                    //System.out.println("rec data: (" + in + ")");
-                    if (in.contains("MouseMove")) {
-                        //handleMouseMovement(in);
-                    } else if (in.contains("MouseClick")) {
+                    if (in.contains("MouseClick")) {
                        handleMouseClick(in);
                     } else if (in.contains("Swipe")) {
                         handleSwipe(in);
+                    } else if (in.contains("exit")) {
+                        System.out.println("Client exit");
+                        m_exit = true;
                     }
                 }
             }
-            //br.close(); //---- closes the socket since inputstream is socket -> error in remoteserver
         } catch (IOException e1) {
             e1.printStackTrace();
         }
     }
 
-    private void handleMouseMovement(String input) {
-        String[] variables = input.split(":");
-        float x = Float.parseFloat(variables[1]);
-        float y = Float.parseFloat(variables[2]);
-        System.out.println("MOUSE MOVEMENT INC: " + x + ";" + y );
-        Point mouse_point = MouseInfo.getPointerInfo().getLocation();
-        float current_x = mouse_point.x;
-        float current_y = mouse_point.y;
-        rob.mouseMove((int) (x), (int) (y));
-    }
-
     private void handleMouseClick(String input) {
-        System.out.println("MOUSE CLICKED!");
         String[] variables = input.split(":");
         float x = Float.parseFloat(variables[1]);
         float y = Float.parseFloat(variables[2]);
