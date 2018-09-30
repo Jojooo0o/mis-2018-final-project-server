@@ -29,12 +29,16 @@ public class RemoteServer {
                 socket = server.accept();
 
                 System.out.println("Client connected: " + socket.getInetAddress());
-                //Thread t = new ClientHandler(socket);
-                //t.start();
-                //System.out.println("Thread for reading started");
+                Thread t = new ClientHandler(socket);
+                t.start();
+                System.out.println("Thread for reading started");
                 while(socket.isConnected()) {
+                    System.out.println("Connection Status: " + socket.isConnected());
+                    System.out.println("sending images");
                     BufferedImage img = captureScreen();
-                    ImageIO.write(img, "bmp", socket.getOutputStream());
+                    if(socket.isConnected()) {
+                        ImageIO.write(img, "png", socket.getOutputStream());
+                    }
                     img.flush();
                 }
                 System.out.println("Client disconnected!");
@@ -49,7 +53,7 @@ public class RemoteServer {
         }
     }
 
-    private BufferedImage captureScreen() throws AWTException {
+    private BufferedImage captureScreen() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Rectangle screenRect = new Rectangle(screenSize);
         return rob.createScreenCapture(screenRect);
